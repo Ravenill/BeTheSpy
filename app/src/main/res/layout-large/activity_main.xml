@@ -15,7 +15,7 @@
         android:text="START"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/desc" />
+        app:layout_constraintTop_toBottomOf="@+id/desc"/>
 
     <Button
         android:id="@+id/optionsButton"
@@ -25,7 +25,7 @@
         android:text="OPTIONS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startButton" />
+        app:layout_constraintTop_toBottomOf="@+id/startButton"/>
 
     <TextView
         android:id="@+id/desc"
@@ -35,6 +35,6 @@
         android:text="SOME KIND OF BLAH, BLAH, BLAH TEXT"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" android:gravity="center_horizontal"/>
 
 </android.support.constraint.ConstraintLayout>
