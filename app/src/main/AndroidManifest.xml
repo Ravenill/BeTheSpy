@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kruk.kruczek.bethespy">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.kruk.kruczek.bethespy">
 
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+                     tools:ignore="ProtectedPermissions"/>
 
     <application
         android:allowBackup="true"
