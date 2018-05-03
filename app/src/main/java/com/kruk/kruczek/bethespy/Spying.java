@@ -2,10 +2,13 @@ package com.kruk.kruczek.bethespy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+
+import static android.view.View.*;
 
 
 public class Spying extends AppCompatActivity
@@ -14,6 +17,7 @@ public class Spying extends AppCompatActivity
 
     private int previousBrightnessLevel;
     private int previousBrightnessMode;
+    private int previousDisplayMode;
     private static final int DARKNESS = 0;
 
     @Override
@@ -25,9 +29,11 @@ public class Spying extends AppCompatActivity
         context = getApplicationContext();
         previousBrightnessLevel = getActualBrightnessLevel();
         previousBrightnessMode = getActualBrightnessMode();
+        previousDisplayMode = getWindow().getDecorView().getSystemUiVisibility();
 
         checkCorrectnessOfPermission();
         setDarkness();
+        setDisplay();
     }
 
     private int getActualBrightnessLevel()
@@ -97,6 +103,13 @@ public class Spying extends AppCompatActivity
         }
     }
 
+    private void setDisplay()
+    {
+        getWindow().getDecorView().setSystemUiVisibility(SYSTEM_UI_FLAG_IMMERSIVE_STICKY | SYSTEM_UI_FLAG_HIDE_NAVIGATION | SYSTEM_UI_FLAG_FULLSCREEN);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+        getSupportActionBar().hide();
+    }
+
     @Override
     public void finish()
     {
@@ -118,10 +131,16 @@ public class Spying extends AppCompatActivity
         }
     }
 
+    private void setPreviousDisplayMode()
+    {
+        getWindow().getDecorView().setSystemUiVisibility(previousDisplayMode);
+    }
+
     @Override
     protected void onPause()
     {
         setPreviousBrightness();
+        setPreviousDisplayMode();
         super.onPause();
     }
 
@@ -129,6 +148,7 @@ public class Spying extends AppCompatActivity
     protected void onStop()
     {
         setPreviousBrightness();
+        setPreviousDisplayMode();
         super.onStop();
     }
 
@@ -136,6 +156,7 @@ public class Spying extends AppCompatActivity
     protected void onResume()
     {
         setDarkness();
+        setDisplay();
         super.onResume();
     }
 
@@ -143,6 +164,7 @@ public class Spying extends AppCompatActivity
     protected void onStart()
     {
         setDarkness();
+        setDisplay();
         super.onStart();
     }
 
