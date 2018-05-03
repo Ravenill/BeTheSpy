@@ -3,17 +3,25 @@ package com.kruk.kruczek.bethespy;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import static android.view.View.*;
 
 
 public class Spying extends AppCompatActivity
 {
+    private Camera camera;
+    private PhotoHandler photoHandler;
+
     private Context context;
+    private View view;
 
     private int previousBrightnessLevel;
     private int previousBrightnessMode;
@@ -26,7 +34,12 @@ public class Spying extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spying);
 
+        setCamera();
+        photoHandler = new PhotoHandler();
+
         context = getApplicationContext();
+        view = getWindow().getDecorView();
+
         previousBrightnessLevel = getActualBrightnessLevel();
         previousBrightnessMode = getActualBrightnessMode();
         previousDisplayMode = getWindow().getDecorView().getSystemUiVisibility();
@@ -34,6 +47,51 @@ public class Spying extends AppCompatActivity
         checkCorrectnessOfPermission();
         setDarkness();
         setDisplay();
+    }
+
+    @Override
+    protected void onStart()
+    {
+        setDarkness();
+        setDisplay();
+        setCamera();
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        setDarkness();
+        setDisplay();
+        setCamera();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        setPreviousBrightness();
+        setPreviousDisplayMode();
+        releaseCamera();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        setPreviousBrightness();
+        setPreviousDisplayMode();
+        releaseCamera();
+        super.onStop();
+    }
+
+    @Override
+    public void finish()
+    {
+        setPreviousBrightness();
+        setPreviousDisplayMode();
+        releaseCamera();
+        super.finish();
     }
 
     private int getActualBrightnessLevel()
@@ -105,16 +163,9 @@ public class Spying extends AppCompatActivity
 
     private void setDisplay()
     {
-        getWindow().getDecorView().setSystemUiVisibility(SYSTEM_UI_FLAG_IMMERSIVE_STICKY | SYSTEM_UI_FLAG_HIDE_NAVIGATION | SYSTEM_UI_FLAG_FULLSCREEN);
-        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+        view.setSystemUiVisibility(SYSTEM_UI_FLAG_IMMERSIVE_STICKY | SYSTEM_UI_FLAG_HIDE_NAVIGATION | SYSTEM_UI_FLAG_FULLSCREEN);
+        view.setBackgroundColor(Color.BLACK);
         getSupportActionBar().hide();
-    }
-
-    @Override
-    public void finish()
-    {
-        setPreviousBrightness();
-        super.finish();
     }
 
     private void setPreviousBrightness()
@@ -133,40 +184,61 @@ public class Spying extends AppCompatActivity
 
     private void setPreviousDisplayMode()
     {
-        getWindow().getDecorView().setSystemUiVisibility(previousDisplayMode);
+        view.setSystemUiVisibility(previousDisplayMode);
+    }
+
+    private void setCamera()
+    {
+        if (camera == null)
+            camera = getCameraInstance();
+    }
+
+    public static Camera getCameraInstance()
+    {
+        Camera temp_camera = null;
+        try
+        {
+            temp_camera = Camera.open();
+        }
+        catch (Exception error)
+        {
+            Log.e("Error", "Cannot access camera");
+        }
+        return temp_camera;
     }
 
     @Override
-    protected void onPause()
+    public boolean onTouchEvent(MotionEvent event)
     {
-        setPreviousBrightness();
-        setPreviousDisplayMode();
-        super.onPause();
+        int action = event.getAction();
+
+        switch (action)
+        {
+            case MotionEvent.ACTION_DOWN:
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                break;
+
+            case MotionEvent.ACTION_UP:
+                makeShot();
+                break;
+        }
+        return false;
     }
 
-    @Override
-    protected void onStop()
+    private void makeShot()
     {
-        setPreviousBrightness();
-        setPreviousDisplayMode();
-        super.onStop();
+        camera.takePicture(null, null, photoHandler);
     }
 
-    @Override
-    protected void onResume()
+    private void releaseCamera()
     {
-        setDarkness();
-        setDisplay();
-        super.onResume();
+        if (camera != null)
+        {
+            camera.release();
+            camera = null;
+        }
     }
-
-    @Override
-    protected void onStart()
-    {
-        setDarkness();
-        setDisplay();
-        super.onStart();
-    }
-
 
 }
