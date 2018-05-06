@@ -90,10 +90,12 @@ public class CameraHandler
         if (cameraDevice != null)
             return;
 
+        startBackgroundThread();
+
         try
         {
             cameraId = cameraManager.getCameraIdList()[0];
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+            if (ActivityCompat.checkSelfPermission(context.getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
             {
                 setSizeOfPictures();
                 cameraManager.openCamera(cameraId, cameraStateCallback, null);
@@ -125,6 +127,7 @@ public class CameraHandler
     {
         if (cameraDevice != null)
         {
+            stopBackgroundThread();
             cameraDevice.close();
             cameraDevice = null;
         }
@@ -195,13 +198,20 @@ public class CameraHandler
 
     private File createFileToSave()
     {
-        String fileName = getPathAndImageName();
-        File file = new File(fileName);
+        String path = getFilePath();
+        File file = new File(path);
 
         return file;
     }
 
-    private String getPathAndImageName()
+    private String getFilePath()
+    {
+        String fileDir = getFileDir();
+        String fileName = getFileName();
+        return fileDir + fileName;
+    }
+
+    private String getFileDir()
     {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BeTheSpy");
 
@@ -213,14 +223,18 @@ public class CameraHandler
                 return "";
             }
         }
-
-        @SuppressLint("SimpleDateFormat") String timeStamp;
-        timeStamp = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss").format(new Date());
-        String result = mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg";
-        return result;
+        return mediaStorageDir.getPath() + File.separator;
     }
 
-    public void startBackgroundThread()
+    private String getFileName()
+    {
+        @SuppressLint("SimpleDateFormat") String timeStamp;
+        timeStamp = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss").format(new Date());
+        String fileName = "IMG_" + timeStamp + ".jpg";
+        return fileName;
+    }
+
+    private void startBackgroundThread()
     {
         if (mBackgroundThread != null)
             return;
@@ -230,7 +244,7 @@ public class CameraHandler
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
 
-    public void stopBackgroundThread()
+    private void stopBackgroundThread()
     {
         if (mBackgroundThread == null)
             return;
