@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class AudioRecordHandler
+public class AudioRecordHandler extends Component
 {
     private MediaRecorder recorder;
     private boolean duringRecording;
@@ -45,6 +45,8 @@ public class AudioRecordHandler
     {
         if (duringRecording == true)
             return;
+
+        registerRecorder();
 
         if (recorder == null)
             return;
@@ -108,15 +110,13 @@ public class AudioRecordHandler
             return;
 
         duringRecording = false;
-        recorder.stop();
+        releaseRecorder();
     }
-
     public void releaseRecorder()
     {
         if (recorder == null)
             return;
 
-        recorder.stop();
         recorder.release();
         recorder = null;
     }

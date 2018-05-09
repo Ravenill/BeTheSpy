@@ -26,7 +26,7 @@ import java.util.List;
 
 import static android.hardware.camera2.CameraMetadata.*;
 
-public class CameraHandler
+public class CameraHandler extends Component
 {
     private Context context;
 
@@ -125,9 +125,10 @@ public class CameraHandler
 
     public void releaseCamera()
     {
+        stopBackgroundThread();
+
         if (cameraDevice != null)
         {
-            stopBackgroundThread();
             cameraDevice.close();
             cameraDevice = null;
         }

@@ -13,10 +13,24 @@ public class MainActivity extends AppCompatActivity
     private Button btnStart;
     private Button btnOptions;
 
+    private boolean optCam;
+    private boolean optRec;
+
+    private static final int START_INTENT_CODE = 101;
+    private static final int OPTION_INTENT_CODE = 102;
+
     private static final String DESC = "Hello there!\n" +
-                                        "Tap on screen - shot from camera,\n" +
-                                        "Rotate phone - start/stop recording,\n" +
-                                        "3x press home button - exit from app";
+            "Tap on screen - shot from camera,\n" +
+            "Rotate phone - start/stop recording";
+
+    private static final String DESC2 = "Hello there!\n" +
+            "Tap on screen - shot from camera";
+
+    private static final String DESC3 = "Hello there!\n" +
+            "Tap on screen - start/stop recording";
+
+    private static final String DESC4 = "Hello there!\n" +
+            "ALL OPTIONS ARE OFF";
 
 
     @Override
@@ -26,7 +40,15 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         createButtons();
+        setOptions();
         setDesc();
+    }
+
+    @Override
+    protected void onStart()
+    {
+        setDesc();
+        super.onStart();
     }
 
     private void createButtons()
@@ -36,6 +58,12 @@ public class MainActivity extends AppCompatActivity
         btnOptions = findViewById(R.id.optionsButton);
 
         setListeners();
+    }
+
+    private void setOptions()
+    {
+        optCam = true;
+        optRec = true;
     }
 
     private void setListeners()
@@ -61,17 +89,63 @@ public class MainActivity extends AppCompatActivity
     public void onClickStart()
     {
         Intent intent = new Intent(this, Spying.class);
-        startActivity(intent);
+        intent.putExtra("CamOpt", optCam);
+        intent.putExtra("RecOpt", optRec);
+        startActivityForResult(intent, START_INTENT_CODE);
     }
 
     public void onClickOptions()
     {
         Intent intent = new Intent(this, Settings.class);
-        startActivity(intent);
+        intent.putExtra("CamOpt", optCam);
+        intent.putExtra("RecOpt", optRec);
+        startActivityForResult(intent, OPTION_INTENT_CODE);
     }
 
     private void setDesc()
     {
-        txtDesc.setText(DESC);
+        if (optCam == true && optRec == true)
+            txtDesc.setText(DESC);
+        else if (optCam == true)
+            txtDesc.setText(DESC2);
+        else if (optRec == true)
+            txtDesc.setText(DESC3);
+        else
+            txtDesc.setText(DESC4);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (resultCode == RESULT_OK)
+        {
+            if (requestCode == START_INTENT_CODE)
+            {
+                onActivityResultStart(data);
+            }
+
+            if (requestCode == OPTION_INTENT_CODE)
+            {
+                onActivityResultOptions(data);
+            }
+        }
+    }
+
+    private void onActivityResultStart(Intent data)
+    {
+        //NOTHING TODO
+    }
+
+    private void onActivityResultOptions(Intent data)
+    {
+        if (data.hasExtra("CamOptReturn"))
+        {
+            optCam = data.getExtras().getBoolean("CamOptReturn");
+        }
+
+        if (data.hasExtra("RecOptReturn"))
+        {
+            optRec = data.getExtras().getBoolean("RecOptReturn");
+        }
     }
 }

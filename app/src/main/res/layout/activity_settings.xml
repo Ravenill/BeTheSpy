@@ -6,4 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".Settings">
 
+    <Switch
+            android:text="@string/camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cam_switch"
+            android:layout_marginTop="40dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.145"/>
+
+    <Switch
+            android:text="@string/audio_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rec_switch"
+            app:layout_constraintStart_toStartOf="@+id/cam_switch"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/cam_switch"
+            />
+
 </android.support.constraint.ConstraintLayout>

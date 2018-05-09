@@ -4,9 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
@@ -17,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.util.List;
 
 public class Spying extends AppCompatActivity
 {
@@ -33,11 +29,18 @@ public class Spying extends AppCompatActivity
     private AudioRecordHandler audioRecorder;
     private SensorAccelerometer sensorAccelerometer;
 
+    private boolean optCam;
+    private boolean optRec;
+
+    private boolean actualrec;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spying);
+
+        getOptions();
 
         context = getApplicationContext();
         view = getWindow().getDecorView();
@@ -49,17 +52,19 @@ public class Spying extends AppCompatActivity
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         checkCorrectnessOfPermission();
-
-        camera = new CameraHandler(context, cameraService, windowManager);
-        audioRecorder = new AudioRecordHandler();
-        display = new DisplayHandler(context, view, supportActionBar);
-        sensorAccelerometer = new SensorAccelerometer(sensorManager, audioRecorder);
+        createComponents();
 
         camera.openCamera();
         audioRecorder.registerRecorder();
-        sensorAccelerometer.registerAccelerometer();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.registerAccelerometer();
+
         display.setDarkness();
         display.setDisplay();
+
+        actualrec = false;
     }
 
     @Override
@@ -69,7 +74,11 @@ public class Spying extends AppCompatActivity
         display.setDisplay();
         camera.openCamera();
         audioRecorder.registerRecorder();
-        sensorAccelerometer.registerAccelerometer();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.registerAccelerometer();
+
         super.onStart();
     }
 
@@ -80,7 +89,11 @@ public class Spying extends AppCompatActivity
         display.setDisplay();
         camera.openCamera();
         audioRecorder.registerRecorder();
-        sensorAccelerometer.registerAccelerometer();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.registerAccelerometer();
+
         super.onResume();
     }
 
@@ -90,8 +103,12 @@ public class Spying extends AppCompatActivity
         display.setPreviousBrightness();
         display.setPreviousDisplayMode();
         camera.releaseCamera();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.releaseAccelerometer();
         audioRecorder.releaseRecorder();
-        sensorAccelerometer.releaseAccelerometer();
+
         super.onPause();
     }
 
@@ -101,8 +118,12 @@ public class Spying extends AppCompatActivity
         display.setPreviousBrightness();
         display.setPreviousDisplayMode();
         camera.releaseCamera();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.releaseAccelerometer();
+
         audioRecorder.releaseRecorder();
-        sensorAccelerometer.releaseAccelerometer();
         super.onStop();
     }
 
@@ -112,8 +133,12 @@ public class Spying extends AppCompatActivity
         display.setPreviousBrightness();
         display.setPreviousDisplayMode();
         camera.releaseCamera();
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer.releaseAccelerometer();
+
         audioRecorder.releaseRecorder();
-        sensorAccelerometer.releaseAccelerometer();
         super.finish();
     }
 
@@ -173,6 +198,25 @@ public class Spying extends AppCompatActivity
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 202);
     }
 
+    private void getOptions()
+    {
+        optCam = getIntent().getExtras().getBoolean("CamOpt");
+        optRec = getIntent().getExtras().getBoolean("RecOpt");
+    }
+
+    private void createComponents()
+    {
+        camera = new CameraHandler(context, cameraService, windowManager);
+        audioRecorder = new AudioRecordHandler();
+        display = new DisplayHandler(context, view, supportActionBar);
+
+        //temporary fix, coz lack of time
+        if (optRec == true && optCam == true)
+            sensorAccelerometer = new SensorAccelerometer(sensorManager, audioRecorder);
+        else
+            sensorAccelerometer = null;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
@@ -181,7 +225,12 @@ public class Spying extends AppCompatActivity
         switch (action)
         {
             case MotionEvent.ACTION_DOWN:
-                camera.makeShot();
+                //temporary fix, coz lack of time
+                if (optCam == true)
+                    camera.makeShot();
+                else if (optRec == true)
+                    audioRecorder.recording(!actualrec);
+                    actualrec = !actualrec;
                 break;
 
             case MotionEvent.ACTION_MOVE:

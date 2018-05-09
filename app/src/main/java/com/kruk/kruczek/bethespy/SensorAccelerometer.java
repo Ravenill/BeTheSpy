@@ -7,7 +7,7 @@ import android.hardware.SensorManager;
 
 import java.util.List;
 
-public class SensorAccelerometer
+public class SensorAccelerometer extends Component
 {
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
